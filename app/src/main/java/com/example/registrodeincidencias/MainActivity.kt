@@ -19,14 +19,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.registrodeincidencias.ui.theme.RegistroDeIncidenciasTheme
 
+// SARA PORTILLO 2924042022
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
+
         setContent {
             RegistroDeIncidenciasTheme {
                 RegistroIncidencias()
@@ -38,8 +43,17 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun RegistroIncidencias() {
 
-    var incidencia by remember { mutableStateOf("") }
-    var mensaje by remember { mutableStateOf("") }
+    var titulo by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
+
+    var mensaje by remember {
+        mutableStateOf("Aún no hay incidencias creadas")
+    }
+
+    // Indica si ya se creó una incidencia
+    var incidenciaCreada by remember {
+        mutableStateOf(false)
+    }
 
     Column(
         modifier = Modifier
@@ -58,33 +72,65 @@ fun RegistroIncidencias() {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Describe la incidencia que deseas registrar",
+            text = "Ingresa la información de la incidencia que deseas reportar",
             fontSize = 16.sp
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Título
         OutlinedTextField(
-            value = incidencia,
-            onValueChange = { incidencia = it },
-            label = { Text("Descripción de la incidencia") },
+            value = titulo,
+            onValueChange = { titulo = it },
+            label = {
+                Text("Título de la incidencia")
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Descripción
+        OutlinedTextField(
+            value = descripcion,
+            onValueChange = { descripcion = it },
+            label = {
+                Text("Descripción breve")
+            },
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(20.dp))
 
+        // Botón Crear Reporte
         Button(
             onClick = {
-                mensaje = "Incidencia registrada correctamente"
+                mensaje = "Reporte Creado: $titulo"
+                incidenciaCreada = true
+
+                titulo = ""
+                descripcion = ""
             }
         ) {
-            Text("Registrar incidencia")
+            Text("Crear Reporte")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Mensaje
         Text(
-            text = mensaje
+            text = mensaje,
+            fontSize = 16.sp,
+            color = if (incidenciaCreada) {
+                Color(0xFF2E7D32)
+            } else {
+                Color.Unspecified
+            },
+            fontWeight = if (incidenciaCreada) {
+                FontWeight.Bold
+            } else {
+                FontWeight.Normal
+            }
         )
     }
 }

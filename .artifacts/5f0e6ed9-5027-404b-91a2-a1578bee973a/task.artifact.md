@@ -1,0 +1,8 @@
+- `[x]` Rediseñar `RegistroIncidencias` en `MainActivity.kt`
+    - `[x]` Agregar importaciones necesarias
+    - `[x]` Implementar el fondo decorativo (Header Gradient + Canvas)
+    - `[x]` Implementar la tarjeta blanca con esquinas redondeadas
+    - `[x]` Estilizar los campos de texto y el botón
+    - `[x]` Mantener la lógica y comentarios originales
+- `[x]` Actualizar `RegistroIncidenciasPreview`
+- `[x]` Verificar compilación y diseño

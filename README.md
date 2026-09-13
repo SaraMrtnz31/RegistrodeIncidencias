@@ -16,6 +16,7 @@ La aplicación permite:
 * Mostrar un mensaje de confirmación con el título de la incidencia.
 * Mostrar el mensaje de confirmación en **color verde y negrita**.
 * Limpiar automáticamente los campos de título y descripción después de crear el reporte.
+* Quitar el foco de los campos de texto después de crear el reporte, dejando la pantalla en su estado inicial.
 
 ## Herramientas utilizadas
 
@@ -36,6 +37,7 @@ La aplicación permite:
 * Mensaje de confirmación después de crear el reporte.
 * Mensaje de confirmación en color verde y negrita.
 * Limpieza automática de los campos después de crear el reporte.
+* Eliminación del foco de los campos después de crear el reporte.
 
 **Pendiente:**
 

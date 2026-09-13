@@ -168,11 +168,15 @@ fun RegistroIncidencias() {
                 // BOTON
                 Button(
                     onClick = {
-                        mensaje = "Reporte Creado: $titulo"
-                        incidenciaCreada = true
-
-                        titulo = ""
-                        descripcion = ""
+                        if (titulo.isBlank() || descripcion.isBlank()) {
+                            mensaje = "Por favor, completa todos los campos requeridos"
+                            incidenciaCreada = false
+                        } else {
+                            mensaje = "Reporte Creado: $titulo"
+                            incidenciaCreada = true
+                            titulo = ""
+                            descripcion = ""
+                        }
                         focusManager.clearFocus()
                     },
                     modifier = Modifier
@@ -195,16 +199,32 @@ fun RegistroIncidencias() {
 
                 // MENSAJE FINAL
                 if (mensaje.isNotEmpty()) {
+                    val backgroundColor = when {
+                        incidenciaCreada -> Color(0xFFE8F5E9)
+                        mensaje == "Por favor, completa todos los campos requeridos" -> Color(0xFFFFEBEE)
+                        else -> Color(0xFFF1F5F9)
+                    }
+                    val textColor = when {
+                        incidenciaCreada -> Color(0xFF2E7D32)
+                        mensaje == "Por favor, completa todos los campos requeridos" -> Color(0xFFC62828)
+                        else -> Color(0xFF64748B)
+                    }
+                    val fontWeight = when {
+                        incidenciaCreada -> FontWeight.Bold
+                        mensaje == "Por favor, completa todos los campos requeridos" -> FontWeight.SemiBold
+                        else -> FontWeight.Normal
+                    }
+
                     Surface(
-                        color = if (incidenciaCreada) Color(0xFFE8F5E9) else Color(0xFFF1F5F9),
+                        color = backgroundColor,
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
                             text = mensaje,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                             fontSize = 14.sp,
-                            color = if (incidenciaCreada) Color(0xFF2E7D32) else Color(0xFF64748B),
-                            fontWeight = if (incidenciaCreada) FontWeight.Bold else FontWeight.Normal,
+                            color = textColor,
+                            fontWeight = fontWeight,
                             textAlign = TextAlign.Center
                         )
                     }

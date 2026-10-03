@@ -1,13 +1,15 @@
 package com.example.registrodeincidencias
-import androidx.compose.ui.platform.LocalFocusManager
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,10 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalFocusManager
 import com.example.registrodeincidencias.ui.theme.RegistroDeIncidenciasTheme
 
 // SARA PORTILLO 2924042022
@@ -42,11 +48,15 @@ fun RegistroIncidencias() {
 
     var titulo by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
+
+    // Prioridad seleccionada
+    var prioridad by remember { mutableStateOf("Media") }
+
     val focusManager = LocalFocusManager.current
-        var mensaje by remember {
+
+    var mensaje by remember {
         mutableStateOf("Aún no hay incidencias creadas")
     }
-
 
     var incidenciaCreada by remember {
         mutableStateOf(false)
@@ -54,32 +64,45 @@ fun RegistroIncidencias() {
 
     Box(modifier = Modifier.fillMaxSize()) {
 
+        // ENCABEZADO
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(300.dp)
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(Color(0xFF2563EB), Color(0xFF1D4ED8), Color(0xFF1E293B))
+                        colors = listOf(
+                            Color(0xFF2563EB),
+                            Color(0xFF1D4ED8),
+                            Color(0xFF1E293B)
+                        )
                     )
                 )
         ) {
+
             Canvas(modifier = Modifier.fillMaxSize()) {
+
                 drawCircle(
                     color = Color.White.copy(alpha = 0.1f),
                     radius = size.width * 0.4f,
-                    center = androidx.compose.ui.geometry.Offset(size.width * 0.1f, size.height * 0.2f)
+                    center = androidx.compose.ui.geometry.Offset(
+                        size.width * 0.1f,
+                        size.height * 0.2f
+                    )
                 )
+
                 drawCircle(
                     color = Color.White.copy(alpha = 0.05f),
                     radius = size.width * 0.6f,
-                    center = androidx.compose.ui.geometry.Offset(size.width * 0.9f, size.height * 0.4f)
+                    center = androidx.compose.ui.geometry.Offset(
+                        size.width * 0.9f,
+                        size.height * 0.4f
+                    )
                 )
             }
 
-
             IconButton(
-                onClick = {  },
+                onClick = { },
                 modifier = Modifier
                     .padding(top = 20.dp, start = 16.dp)
                     .align(Alignment.TopStart)
@@ -93,23 +116,28 @@ fun RegistroIncidencias() {
             }
         }
 
-
+        // CONTENIDO PRINCIPAL
         Surface(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 220.dp),
             color = Color.White,
-            shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
+            shape = RoundedCornerShape(
+                topStart = 32.dp,
+                topEnd = 32.dp
+            )
         ) {
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // TITULO PPAL
+                // TÍTULO PRINCIPAL
                 Text(
                     text = "Registro de Incidencias",
                     fontSize = 24.sp,
@@ -120,7 +148,7 @@ fun RegistroIncidencias() {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                //SUBTITULO
+                // SUBTÍTULO
                 Text(
                     text = "Ingresa la información de la incidencia que deseas reportar",
                     fontSize = 14.sp,
@@ -131,13 +159,23 @@ fun RegistroIncidencias() {
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                //TITULO
+                // TÍTULO
                 OutlinedTextField(
                     value = titulo,
                     onValueChange = { titulo = it },
-                    label = { Text("Título de la incidencia") },
+                    label = {
+                        Text("Título de la incidencia")
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
+
+                    // CONFIGURACIÓN DEL TECLADO
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Sentences,
+                        imeAction = ImeAction.Next
+                    ),
+
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0xFF2563EB),
                         unfocusedBorderColor = Color(0xFFE2E8F0),
@@ -148,13 +186,24 @@ fun RegistroIncidencias() {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // DESCRIPCION
+                // DESCRIPCIÓN
                 OutlinedTextField(
                     value = descripcion,
                     onValueChange = { descripcion = it },
-                    label = { Text("Descripción breve") },
-                    modifier = Modifier.fillMaxWidth().height(130.dp),
+                    label = {
+                        Text("Descripción breve")
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(130.dp),
                     shape = RoundedCornerShape(16.dp),
+
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Sentences,
+                        imeAction = ImeAction.Done
+                    ),
+
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0xFF2563EB),
                         unfocusedBorderColor = Color(0xFFE2E8F0),
@@ -163,30 +212,97 @@ fun RegistroIncidencias() {
                     )
                 )
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-                // BOTON
+                // PRIORIDAD
+                Text(
+                    text = "Prioridad",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF1E293B)
+                )
+
+                // OPCIONES DE PRIORIDAD
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+
+                    PrioridadItem(
+                        texto = "Baja",
+                        seleccionada = prioridad == "Baja",
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            prioridad = "Baja"
+                            mensaje = "Prioridad seleccionada: Baja"
+                            incidenciaCreada = false
+                        }
+                    )
+
+                    PrioridadItem(
+                        texto = "Media",
+                        seleccionada = prioridad == "Media",
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            prioridad = "Media"
+                            mensaje = "Prioridad seleccionada: Media"
+                            incidenciaCreada = false
+                        }
+                    )
+
+                    PrioridadItem(
+                        texto = "Alta",
+                        seleccionada = prioridad == "Alta",
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            prioridad = "Alta"
+                            mensaje = "Prioridad seleccionada: Alta"
+                            incidenciaCreada = false
+                        }
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // BOTÓN
                 Button(
                     onClick = {
+
                         if (titulo.isBlank() || descripcion.isBlank()) {
-                            mensaje = "Por favor, completa todos los campos requeridos"
+
+                            mensaje =
+                                "Por favor, completa todos los campos requeridos"
+
                             incidenciaCreada = false
+
                         } else {
-                            mensaje = "Reporte Creado: $titulo"
+
+                            mensaje =
+                                "Reporte creado: $titulo | Prioridad: $prioridad"
+
                             incidenciaCreada = true
+
                             titulo = ""
                             descripcion = ""
                         }
+
                         focusManager.clearFocus()
                     },
+
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(54.dp),
+
                     shape = RoundedCornerShape(24.dp),
+
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF2563EB)
                     )
                 ) {
+
                     Text(
                         text = "Crear Reporte",
                         fontWeight = FontWeight.SemiBold,
@@ -199,29 +315,57 @@ fun RegistroIncidencias() {
 
                 // MENSAJE FINAL
                 if (mensaje.isNotEmpty()) {
+
                     val backgroundColor = when {
-                        incidenciaCreada -> Color(0xFFE8F5E9)
-                        mensaje == "Por favor, completa todos los campos requeridos" -> Color(0xFFFFEBEE)
-                        else -> Color(0xFFF1F5F9)
+
+                        incidenciaCreada ->
+                            Color(0xFFE8F5E9)
+
+                        mensaje ==
+                                "Por favor, completa todos los campos requeridos" ->
+                            Color(0xFFFFEBEE)
+
+                        else ->
+                            Color(0xFFF1F5F9)
                     }
+
                     val textColor = when {
-                        incidenciaCreada -> Color(0xFF2E7D32)
-                        mensaje == "Por favor, completa todos los campos requeridos" -> Color(0xFFC62828)
-                        else -> Color(0xFF64748B)
+
+                        incidenciaCreada ->
+                            Color(0xFF2E7D32)
+
+                        mensaje ==
+                                "Por favor, completa todos los campos requeridos" ->
+                            Color(0xFFC62828)
+
+                        else ->
+                            Color(0xFF64748B)
                     }
+
                     val fontWeight = when {
-                        incidenciaCreada -> FontWeight.Bold
-                        mensaje == "Por favor, completa todos los campos requeridos" -> FontWeight.SemiBold
-                        else -> FontWeight.Normal
+
+                        incidenciaCreada ->
+                            FontWeight.Bold
+
+                        mensaje ==
+                                "Por favor, completa todos los campos requeridos" ->
+                            FontWeight.SemiBold
+
+                        else ->
+                            FontWeight.Normal
                     }
 
                     Surface(
                         color = backgroundColor,
                         shape = RoundedCornerShape(12.dp)
                     ) {
+
                         Text(
                             text = mensaje,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                            modifier = Modifier.padding(
+                                horizontal = 16.dp,
+                                vertical = 8.dp
+                            ),
                             fontSize = 14.sp,
                             color = textColor,
                             fontWeight = fontWeight,
@@ -234,9 +378,55 @@ fun RegistroIncidencias() {
     }
 }
 
+/**
+ * Componente reutilizable para seleccionar la prioridad.
+ * Utiliza Modifier.clickable porque solamente necesitamos
+ * detectar un toque sobre la opción.
+ */
+@Composable
+fun PrioridadItem(
+    texto: String,
+    seleccionada: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+
+    Surface(
+        modifier = modifier
+            .height(48.dp)
+            .clickable {
+                onClick()
+            },
+        shape = RoundedCornerShape(12.dp),
+        color = if (seleccionada) {
+            Color(0xFF2563EB)
+        } else {
+            Color(0xFFF1F5F9)
+        }
+    ) {
+
+        Box(
+            contentAlignment = Alignment.Center
+        ) {
+
+            Text(
+                text = texto,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = if (seleccionada) {
+                    Color.White
+                } else {
+                    Color(0xFF475569)
+                }
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun RegistroIncidenciasPreview() {
+
     RegistroDeIncidenciasTheme {
         RegistroIncidencias()
     }

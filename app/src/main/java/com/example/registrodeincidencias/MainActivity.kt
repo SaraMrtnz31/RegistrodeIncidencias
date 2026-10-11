@@ -1,21 +1,34 @@
+
 package com.example.registrodeincidencias
 
+import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Bundle
+
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -24,10 +37,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalFocusManager
+
 import com.example.registrodeincidencias.ui.theme.RegistroDeIncidenciasTheme
 
 // SARA PORTILLO 2924042022
+
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -131,6 +145,7 @@ fun RegistroIncidencias() {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -157,9 +172,14 @@ fun RegistroIncidencias() {
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                // TÍTULO
+                // NUEVA SECCIÓN: ACELERÓMETRO
+                SensorAcelerometro()
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // TÍTULO DE LA INCIDENCIA
                 OutlinedTextField(
                     value = titulo,
                     onValueChange = { titulo = it },
@@ -168,14 +188,11 @@ fun RegistroIncidencias() {
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
-
-                    // CONFIGURACIÓN DEL TECLADO
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
                         capitalization = KeyboardCapitalization.Sentences,
                         imeAction = ImeAction.Next
                     ),
-
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0xFF2563EB),
                         unfocusedBorderColor = Color(0xFFE2E8F0),
@@ -197,13 +214,11 @@ fun RegistroIncidencias() {
                         .fillMaxWidth()
                         .height(130.dp),
                     shape = RoundedCornerShape(16.dp),
-
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
                         capitalization = KeyboardCapitalization.Sentences,
                         imeAction = ImeAction.Done
                     ),
-
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0xFF2563EB),
                         unfocusedBorderColor = Color(0xFFE2E8F0),
@@ -267,7 +282,7 @@ fun RegistroIncidencias() {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // BOTÓN
+                // BOTÓN CREAR REPORTE
                 Button(
                     onClick = {
 
@@ -291,13 +306,10 @@ fun RegistroIncidencias() {
 
                         focusManager.clearFocus()
                     },
-
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(54.dp),
-
                     shape = RoundedCornerShape(24.dp),
-
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF2563EB)
                     )
@@ -373,16 +385,146 @@ fun RegistroIncidencias() {
                         )
                     }
                 }
+
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
     }
 }
 
-/**
- * Componente reutilizable para seleccionar la prioridad.
- * Utiliza Modifier.clickable porque solamente necesitamos
- * detectar un toque sobre la opción.
- */
+
+@Composable
+fun SensorAcelerometro() {
+
+    val context = LocalContext.current
+
+    val sensorManager = remember(context) {
+        context.getSystemService(Context.SENSOR_SERVICE)
+                as? SensorManager
+    }
+
+    val acelerometro = remember(sensorManager) {
+        sensorManager?.getDefaultSensor(
+            Sensor.TYPE_ACCELEROMETER
+        )
+    }
+
+    var x by remember { mutableStateOf(0f) }
+    var y by remember { mutableStateOf(0f) }
+    var z by remember { mutableStateOf(0f) }
+
+    var estado by remember {
+        mutableStateOf("Comprobando sensor...")
+    }
+
+    DisposableEffect(sensorManager, acelerometro) {
+
+        if (sensorManager == null || acelerometro == null) {
+
+            estado = "Acelerómetro no disponible"
+
+            onDispose { }
+
+        } else {
+
+            val listener = object : SensorEventListener {
+
+                override fun onSensorChanged(
+                    event: SensorEvent
+                ) {
+                    x = event.values[0]
+                    y = event.values[1]
+                    z = event.values[2]
+                }
+
+                override fun onAccuracyChanged(
+                    sensor: Sensor?,
+                    accuracy: Int
+                ) {
+                }
+            }
+
+            val registrado = sensorManager.registerListener(
+                listener,
+                acelerometro,
+                SensorManager.SENSOR_DELAY_NORMAL
+            )
+
+            estado = if (registrado) {
+                "Acelerómetro disponible"
+            } else {
+                "No se pudo iniciar la lectura"
+            }
+
+            onDispose {
+                sensorManager.unregisterListener(listener)
+            }
+        }
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFEFF6FF)
+        ),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            Text(
+                text = "Monitor de movimiento",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF1E293B)
+            )
+
+            Text(
+                text = estado,
+                color = if (
+                    estado == "Acelerómetro disponible"
+                ) {
+                    Color(0xFF15803D)
+                } else {
+                    Color(0xFFB91C1C)
+                },
+                fontWeight = FontWeight.SemiBold
+            )
+
+            HorizontalDivider(
+                color = Color(0xFFBFDBFE)
+            )
+
+            Text(
+                text = "Eje X: %.2f m/s²".format(x),
+                color = Color(0xFF334155)
+            )
+
+            Text(
+                text = "Eje Y: %.2f m/s²".format(y),
+                color = Color(0xFF334155)
+            )
+
+            Text(
+                text = "Eje Z: %.2f m/s²".format(z),
+                color = Color(0xFF334155)
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Mueve suavemente el dispositivo para observar los cambios.",
+                fontSize = 12.sp,
+                color = Color(0xFF475569)
+            )
+        }
+    }
+}
+
+
 @Composable
 fun PrioridadItem(
     texto: String,
@@ -422,6 +564,7 @@ fun PrioridadItem(
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
